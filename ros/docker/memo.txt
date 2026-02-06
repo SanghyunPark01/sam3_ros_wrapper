@@ -1,6 +1,0 @@
-cd sam3_ros_wrapper/docker
-docker build -f Dockfile.ros1 -t sam3_ros1:latest .
-
-다 되면,
-sudo chmod 777 launch.sh
-./ros1_launch.sh
