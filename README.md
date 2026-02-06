@@ -61,6 +61,7 @@ If your environment is ready, build `sam3_ros_wrapper`.
 ```
 cd (your_ros_worksapce)/src
 git clone https://github.com/SanghyunPark01/sam3_ros_wrapper
+git clone https://github.com/SanghyunPark01/segmentation_ros_msg
 ```
 
 - ROS1
