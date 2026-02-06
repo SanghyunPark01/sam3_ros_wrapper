@@ -1,0 +1,5 @@
+<launch>
+    <rosparam command="load" file="$(find sam3_ros_wrapper)/config/config.yaml" />
+    <arg name="path_to_package" default="$(find sam3_ros_wrapper)/"/>
+    <node pkg="sam3_ros_wrapper" type="sam3_ros1.py" name="sam3_ros1" output="screen"/>
+</launch>

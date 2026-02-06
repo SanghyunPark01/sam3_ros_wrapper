@@ -1,0 +1,11 @@
+sam3_ros_wrapper:
+  ros__parameters:
+    weight_path: "/workspace/ros_workspace/sam_ws/src/sam3_ros_wrapper/weight/sam3.pt"
+    default_prompt: "human"
+    mode: "keep_last" # keep_last, keep_all
+
+    input_img_topic: "/kitti/camera_color_left/image_raw" # /camera/image_color *** /kitti/camera_color_left/image_raw
+
+    debug:
+      log: true
+      vis: false

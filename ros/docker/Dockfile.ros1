@@ -1,0 +1,107 @@
+FROM nvidia/cuda:12.6.3-cudnn-devel-ubuntu20.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+SHELL ["/bin/bash", "-lc"]
+ARG PYTHON_VERSION=3.12.7
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates curl wget git \
+    build-essential make pkg-config \
+    libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev \
+    libffi-dev liblzma-dev tk-dev uuid-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN set -eux; \
+    mkdir -p /tmp/python-src; \
+    cd /tmp/python-src; \
+    curl -fsSLO "https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tgz"; \
+    tar -xzf "Python-${PYTHON_VERSION}.tgz"; \
+    cd "Python-${PYTHON_VERSION}"; \
+    ./configure \
+      --prefix=/opt/python/${PYTHON_VERSION} \
+      --enable-optimizations \
+      --with-lto \
+      --enable-shared; \
+    make -j"$(nproc)"; \
+    make install; \
+    ldconfig; \
+    echo "/opt/python/${PYTHON_VERSION}/lib" > /etc/ld.so.conf.d/python312.conf; \
+    ldconfig; \
+    ln -sf /opt/python/${PYTHON_VERSION}/bin/python3.12 /usr/local/bin/python3.12; \
+    ln -sf /opt/python/${PYTHON_VERSION}/bin/pip3.12 /usr/local/bin/pip3.12; \
+    ln -sf /usr/local/bin/python3.12 /usr/local/bin/python; \
+    ln -sf /usr/local/bin/pip3.12 /usr/local/bin/pip; \
+    rm -rf /tmp/python-src
+
+RUN python3.12 --version && python -c "import ssl, sqlite3, zlib, bz2, lzma, ctypes; print('ok')" && pip --version
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ffmpeg \
+    libgl1 \
+    libglib2.0-0 \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN python -m pip install --upgrade pip setuptools wheel
+RUN pip install --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/cu128 --no-cache-dir
+
+WORKDIR /root
+RUN git clone https://github.com/facebookresearch/sam3.git
+WORKDIR /root/sam3
+RUN pip install -e .
+
+RUN python -c "import torch; print(torch.__version__, torch.cuda.is_available())"
+
+RUN pip install --no-cache-dir einops
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    cmake \
+    llvm-dev \
+    libtinfo-dev \
+    libopencv-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN pip install --no-cache-dir decord
+RUN pip install --no-cache-dir -U cython && \
+    pip install --no-cache-dir pycocotools && \
+    pip install --no-cache-dir psutil
+
+RUN pip install --no-cache-dir opencv-python==4.11.0.86
+RUN pip install --no-cache-dir opencv-contrib-python==4.11.0.86
+
+RUN pip install --no-cache-dir matplotlib
+RUN pip install --no-cache-dir pandas
+
+RUN pip install --no-cache-dir scikit-image
+RUN pip install --no-cache-dir scikit-learn
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    locales tzdata \
+    lsb-release gnupg2 dirmngr \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN locale-gen en_US en_US.UTF-8 && \
+    update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
+ENV LANG=en_US.UTF-8
+ENV LC_ALL=en_US.UTF-8
+
+RUN apt-get update && apt-get install -y --no-install-recommends curl && \
+    curl -fsSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | apt-key add - && \
+    echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros1-latest.list && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ros-noetic-desktop-full \
+    python3-rosdep python3-rosinstall python3-rosinstall-generator python3-wstool python3-catkin-tools \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN rosdep init || true && rosdep update
+
+RUN echo "source /opt/ros/noetic/setup.bash" >> /root/.bashrc
+
+ENV ROS_DISTRO=noetic
+ENV ROS_ROOT=/opt/ros/noetic/share/ros
+ENV ROS_PACKAGE_PATH=/opt/ros/noetic/share
+ENV PATH=/opt/ros/noetic/bin:$PATH
+ENV LD_LIBRARY_PATH=/opt/ros/noetic/lib:$LD_LIBRARY_PATH
+ENV PYTHONPATH=/opt/ros/noetic/lib/python3/dist-packages:$PYTHONPATH
