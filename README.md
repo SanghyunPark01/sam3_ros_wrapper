@@ -13,7 +13,7 @@ It enables using SAM3-based segmentation within ROS pipelines while keeping the 
 - ❌ No model weights included
 
 <div align="center">
-    <video src="sam3_test.mp4" controls width=""></video>
+    <video src="sam3_test.mp4" controls width="1000"></video>
 </div>
 
 
