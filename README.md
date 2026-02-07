@@ -12,10 +12,7 @@ It enables using SAM3-based segmentation within ROS pipelines while keeping the 
 - ❌ No pre-built binaries
 - ❌ No model weights included
 
-<div align="center">
-    <video src="sam3_test.mp4" controls width="1000"></video>
-</div>
-
+![demo video](https://github.com/user-attachments/assets/09ad7fbb-2ceb-4db3-a005-d4374342f281)
 
 ## Requirements
 ### Common
