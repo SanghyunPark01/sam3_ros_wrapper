@@ -12,6 +12,11 @@ It enables using SAM3-based segmentation within ROS pipelines while keeping the 
 - ❌ No pre-built binaries
 - ❌ No model weights included
 
+<div align="center">
+    <video src="sam3_test.mp4" controls width=""></video>
+</div>
+
+
 ## Requirements
 ### Common
 - NVIDIA GPU (recommended)
