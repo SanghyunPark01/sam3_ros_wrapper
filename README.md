@@ -82,6 +82,17 @@ git clone https://github.com/SanghyunPark01/segmentation_ros_msg
     colcon build
     ```
 
+## RUN
+- ROS1
+    ```
+    roslaunch sam3_ros_wrapper sam3_ros1.launch
+    ```
+
+- ROS2
+    ```
+    ros2 launch sam3_ros_wrapper sam3_ros2.launch.py
+    ```
+
 ## Parameters and API
 ### Parameters
 Parameters are in `ros/config/config.yaml`.  

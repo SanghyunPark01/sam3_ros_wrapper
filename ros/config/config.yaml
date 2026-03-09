@@ -8,4 +8,4 @@ sam3_ros_wrapper:
 
     debug:
       log: true
-      vis: false
+      vis: true
